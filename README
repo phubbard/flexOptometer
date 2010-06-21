@@ -20,6 +20,7 @@ Software requirements:
 * Twisted
 * FTDI serial-over-usb driver
 * (Soon, I hope) veusz for plotting http://home.gna.org/veusz/
+* pyserial module
 
 Project status:
 * Code works now. Connects, sets up continuous sampling at the default 5Hz, timestamps and logs all samples
