@@ -1,0 +1,31 @@
+Paul Hubbard phubbard@watchotaku.com
+June 21 2010
+
+Picture:
+ http://watchotaku.com/download/thumbnails/4456686/DSCF2267.jpg
+
+This is the source code for my automator/driver for the Gamma Scientific flexOptometer. Just started,
+already allows the automated collection of data and saving to a text (CSV) file.
+
+The use case is the measurement of watch luminosity, see 
+
+http://watchotaku.com/display/swr/Measure+luminosity
+
+Hardware requirements:
+* flexOptometer http://www.gamma-sci.com/products/flexOptometer.html with sensor, filter(s), etc
+* Dark environment/sample chamber. See http://watchotaku.com/display/swr/Build+a+UV+watch+illuminator
+
+Software requirements:
+* Python
+* Twisted
+* FTDI serial-over-usb driver
+
+Project status:
+* Code works now. Connects, sets up continuous sampling at the default 5Hz, timestamps and logs all samples
+  as tab-delimited text. Good enough for now.
+
+Planned features:
+* Add header and units to datafiles
+* Move datafiles to data directory, so that I can use github to host my data and share it.
+* Manual sampling at configurable rates. 5Hz is probably 10x too fast, really.
+
