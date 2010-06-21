@@ -19,6 +19,7 @@ Software requirements:
 * Python
 * Twisted
 * FTDI serial-over-usb driver
+* (Soon, I hope) veusz for plotting http://home.gna.org/veusz/
 
 Project status:
 * Code works now. Connects, sets up continuous sampling at the default 5Hz, timestamps and logs all samples
@@ -28,4 +29,4 @@ Planned features:
 * Add header and units to datafiles
 * Move datafiles to data directory, so that I can use github to host my data and share it.
 * Manual sampling at configurable rates. 5Hz is probably 10x too fast, really.
-
+* Live plotting, curve fits and extrapolation to no-longer-readable threshold. 
