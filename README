@@ -23,11 +23,12 @@ Software requirements:
 * pyserial module
 
 Project status:
-* Code works now. Connects, sets up continuous sampling at the default 5Hz, timestamps and logs all samples
-  as tab-delimited text. Good enough for now.
+* Code works now! 
+* Command-line configurable sample delay, data directory and filename. (also serial port, baud rate, etc) 
+* Now writing a simple metadata file header (timestamp, units, copyright, url)
 
 Planned features:
-* Add header and units to datafiles
-* Move datafiles to data directory, so that I can use github to host my data and share it.
-* Manual sampling at configurable rates. 5Hz is probably 10x too fast, really.
-* Live plotting, curve fits and extrapolation to no-longer-readable threshold. 
+* Live plotting, curve fits and extrapolation to no-longer-readable threshold.
+
+Next steps:
+* Re-run reference watches with new datafile and sampling code, & upload to github.
