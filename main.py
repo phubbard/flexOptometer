@@ -13,22 +13,26 @@ import logging
 
 from twisted.protocols.basic import LineReceiver
 
-from twisted.internet import reactor
+from twisted.internet import reactor, task
 from twisted.internet.serialport import SerialPort
 from twisted.python import usage
+
+from datafiles import FODatafile
 
 class THOptions(usage.Options):
     optParameters = [
         ['baudrate', 'b', 115200, 'Serial baudrate'],
         ['port', 'p', '/dev/tty.usbserial-A700ejg7', 'Serial port to use'],
         ['filename', 'f', 'datafile.txt', 'datafile to append to'],
+        ['data_dir', 'd', 'data', 'Datafile directory to write to'],
+        ['sample_delay', 's', '5.0', 'Seconds between samples'],
         ['junktime', 'j', 2, 'Seconds worth of data to discard at start'],
         ['runtime', 'r', 0, 'Seconds to capture data'],
         ]
 
 class FlexOpt(LineReceiver):
-    def __init__(self, filename,  run_time=0, junk_time=2):
-        self.fh = open(filename, 'w+')
+    def __init__(self, filename, data_dir=None, run_time=0, junk_time=2):
+        self.dfile = FODatafile(filename, data_dir)
         logging.debug('Filename: %s Delay time: %f' % (filename, junk_time))
         if run_time > 0:
             logging.debug('Run time: %d seconds' % run_time)
@@ -39,8 +43,14 @@ class FlexOpt(LineReceiver):
     def connectionMade(self):
         logging.debug('Connection made!')
         # set continuous sampling mode
-        self.transport.write('\rreac\r')
+        # self.transport.write('\rreac\r')
         self.tzero = time.time()
+
+    def do_sample(self):
+        """
+        Do a single sample on demand. Triggers lineReceived.
+        """
+        self.transport.write('\rrea\r')
 
     def lineReceived(self, line):
         if time.time() < self.go_time:
@@ -60,12 +70,12 @@ class FlexOpt(LineReceiver):
         logstr = '%s\t%s\n' % (ts, str)
         logging.debug(logstr.strip())
 
-        self.fh.write(logstr)
+        self.dfile.write_datum(ts, fv)
 
         if self.run_time > 0:
             if time.time() > self.end_time:
                 logging.info('Done.')
-                self.fh.close()
+                self.dfile.close()
                 self.transport.write('\r')
                 self.transport.write('beep\r')
                 self.transport.loseConnection()
@@ -90,10 +100,17 @@ if __name__ == '__main__':
 
     port = o.opts['port']
     filename = o.opts['filename']
+    data_dir = o.opts['data_dir']
     junk_time = int(o.opts['junktime'])
     run_time = int(o.opts['runtime'])
+    sample_delay = float(o.opts['sample_delay'])
 
     logging.debug('About to open port %s' % port)
-    s = SerialPort(FlexOpt(filename, run_time=run_time, junk_time=junk_time),
-                   port, reactor, baudrate=baudrate)
+    fo = FlexOpt(filename, data_dir=data_dir, run_time=run_time,
+                           junk_time=junk_time)
+    s = SerialPort(fo, port, reactor, baudrate=baudrate)
+
+    pt = task.LoopingCall(fo.do_sample)
+    pt.start(sample_delay)
+
     reactor.run()

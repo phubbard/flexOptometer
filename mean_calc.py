@@ -7,7 +7,6 @@
 """
 
 import logging
-import math
 import sys
 
 from twisted.python import usage
