@@ -13,11 +13,14 @@ class FODatafile():
     Wrapper class for datafiles. Idea is to encapsulate headers and such,
     with an eye out for later changing save formats.
     """
-    def __init__(self, filename, data_dir=None):
+    def __init__(self, filename, data_dir=None, watch_url=None):
         if data_dir:
             self.filename = data_dir + '/' + filename
         else:
             self.filename = filename
+
+        if watch_url:
+            self.watch_url = watch_url
 
         self.fh = open(self.filename, 'w')
         self.write_fileheader()
@@ -37,6 +40,8 @@ class FODatafile():
         rn = datetime.date.today()
 
         buf.append('Filename: %s' % self.filename)
+        if self.watch_url:
+            buf.append('Watch info at: ' + self.watch_url)
         buf.append('Copyright Paul Hubbard (phubbard@watchotaku.com) %d' % rn.year)
         buf.append('License: http://creativecommons.org/licenses/by/3.0/us/')
         buf.append('See http://watchotaku.com/display/swr/Measure+luminosity')

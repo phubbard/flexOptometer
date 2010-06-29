@@ -24,6 +24,7 @@ class THOptions(usage.Options):
         ['baudrate', 'b', 115200, 'Serial baudrate'],
         ['port', 'p', '/dev/tty.usbserial-A700ejg7', 'Serial port to use'],
         ['filename', 'f', 'datafile.txt', 'datafile to append to'],
+        ['watch_url', 'u', None, 'URL for watch information'],
         ['data_dir', 'd', 'data', 'Datafile directory to write to'],
         ['sample_delay', 's', '5.0', 'Seconds between samples'],
         ['junktime', 'j', 2, 'Seconds worth of data to discard at start'],
@@ -114,9 +115,11 @@ if __name__ == '__main__':
     junk_time = int(o.opts['junktime'])
     run_time = int(o.opts['runtime'])
     sample_delay = float(o.opts['sample_delay'])
+    watch_url = o.opts['watch_url']
 
     logging.debug('About to open port %s' % port)
-    fo = FlexOpt(filename, data_dir=data_dir, run_time=run_time, junk_time=junk_time)
+    fo = FlexOpt(filename, data_dir=data_dir, run_time=run_time,
+                 junk_time=junk_time, watch_url=watch_url)
     s = SerialPort(fo, port, reactor, baudrate=baudrate)
 
     # Setup periodic sampling call
