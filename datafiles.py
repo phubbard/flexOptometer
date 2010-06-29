@@ -23,10 +23,10 @@ class FODatafile():
         self.write_fileheader()
 
     def close(self):
-        self.fh.close()
+        return self.fh.close()
 
-    def write(self, data):
-        self.fh.write(data)
+    def flush(self):
+        return self.fh.flush()
 
     def write_datum(self, time, reading):
         self.fh.write('%f\t%f' % (time, reading))
@@ -42,6 +42,7 @@ class FODatafile():
         buf.append('See http://watchotaku.com/display/swr/Measure+luminosity')
         buf.append('Timestamp: %s' % datetime.datetime.now())
         buf.append('UTC timestamp: %s' % datetime.datetime.utcnow())
+        buf.append('')
         buf.append('Time(seconds)\tLux')
 
         for line in buf:

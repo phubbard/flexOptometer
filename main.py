@@ -56,9 +56,10 @@ class FlexOpt(LineReceiver):
 
         ts = time.time() - self.tzero
         str = line.strip()
+
         if len(str) == 0:
             return
-        
+
         if str[0] == '*':
             logging.warn('Ignoring line "%s"' % str)
             return
@@ -66,7 +67,16 @@ class FlexOpt(LineReceiver):
         if str == 'Ok':
             return
 
-        fv = float(str)
+        if str == 'ERROR-Command not recognized.':
+            logging.error('Unknown command!')
+            return
+
+        try:
+            fv = float(str)
+        except ValueError, ve:
+            logging.exception('Error parsing as float: ')
+            return
+
         if fv < 0.0:
             logging.warn('Dropping negative value %f' % fv)
             return
@@ -81,7 +91,7 @@ class FlexOpt(LineReceiver):
                 logging.info('Done.')
                 self.dfile.close()
                 self.transport.write('\r')
-                self.transport.write('beep\r')
+                self.transport.write('bee\r')
                 self.transport.loseConnection()
                 reactor.stop()
 
