@@ -33,7 +33,7 @@ class THOptions(usage.Options):
 class FlexOpt(LineReceiver):
     def __init__(self, filename, data_dir=None, run_time=0, junk_time=2):
         self.dfile = FODatafile(filename, data_dir)
-        logging.debug('Filename: %s Delay time: %f' % (filename, junk_time))
+        logging.debug('Filename: %s Initial delay time: %f' % (self.dfile.filename, junk_time))
         if run_time > 0:
             logging.debug('Run time: %d seconds' % run_time)
         self.go_time = time.time() + junk_time
@@ -41,9 +41,7 @@ class FlexOpt(LineReceiver):
         self.run_time = run_time
 
     def connectionMade(self):
-        logging.debug('Connection made!')
-        # set continuous sampling mode
-        # self.transport.write('\rreac\r')
+        logging.debug('Connection made to the flexOptometer!')
         self.tzero = time.time()
 
     def do_sample(self):
@@ -58,8 +56,14 @@ class FlexOpt(LineReceiver):
 
         ts = time.time() - self.tzero
         str = line.strip()
+        if len(str) == 0:
+            return
+        
         if str[0] == '*':
             logging.warn('Ignoring line "%s"' % str)
+            return
+
+        if str == 'Ok':
             return
 
         fv = float(str)
@@ -67,7 +71,7 @@ class FlexOpt(LineReceiver):
             logging.warn('Dropping negative value %f' % fv)
             return
 
-        logstr = '%s\t%s\n' % (ts, str)
+        logstr = '%s\t%s\n' % (ts, fv)
         logging.debug(logstr.strip())
 
         self.dfile.write_datum(ts, fv)
@@ -80,8 +84,6 @@ class FlexOpt(LineReceiver):
                 self.transport.write('beep\r')
                 self.transport.loseConnection()
                 reactor.stop()
-                return
-
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, \
@@ -95,9 +97,7 @@ if __name__ == '__main__':
         logging.info('Try %s --help for usage details' % sys.argv[0])
         raise SystemExit, 1
 
-    if o.opts['baudrate']:
-        baudrate = int(o.opts['baudrate'])
-
+    baudrate = int(o.opts['baudrate'])
     port = o.opts['port']
     filename = o.opts['filename']
     data_dir = o.opts['data_dir']
@@ -106,11 +106,12 @@ if __name__ == '__main__':
     sample_delay = float(o.opts['sample_delay'])
 
     logging.debug('About to open port %s' % port)
-    fo = FlexOpt(filename, data_dir=data_dir, run_time=run_time,
-                           junk_time=junk_time)
+    fo = FlexOpt(filename, data_dir=data_dir, run_time=run_time, junk_time=junk_time)
     s = SerialPort(fo, port, reactor, baudrate=baudrate)
 
+    # Setup periodic sampling call
     pt = task.LoopingCall(fo.do_sample)
+    # Setup interval for same
     pt.start(sample_delay)
 
     reactor.run()

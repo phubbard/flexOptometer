@@ -15,7 +15,7 @@ class FODatafile():
     """
     def __init__(self, filename, data_dir=None):
         if data_dir:
-            self.filename = data_dir + os.pathsep + filename
+            self.filename = data_dir + '/' + filename
         else:
             self.filename = filename
 
@@ -38,7 +38,8 @@ class FODatafile():
 
         buf.append('Filename: %s' % self.filename)
         buf.append('Copyright Paul Hubbard (phubbard@watchotaku.com) %d' % rn.year)
-        buf.append('See http://github.com/phubbard/flexOptometer')
+        buf.append('License: http://creativecommons.org/licenses/by/3.0/us/')
+        buf.append('See http://watchotaku.com/display/swr/Measure+luminosity')
         buf.append('Timestamp: %s' % datetime.datetime.now())
         buf.append('UTC timestamp: %s' % datetime.datetime.utcnow())
         buf.append('Time(seconds)\tLux')
