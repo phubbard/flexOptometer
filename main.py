@@ -32,8 +32,8 @@ class THOptions(usage.Options):
         ]
 
 class FlexOpt(LineReceiver):
-    def __init__(self, filename, data_dir=None, run_time=0, junk_time=2):
-        self.dfile = FODatafile(filename, data_dir)
+    def __init__(self, filename, data_dir=None, run_time=0, junk_time=2, watch_url=None):
+        self.dfile = FODatafile(filename, data_dir, watch_url=watch_url)
         logging.debug('Filename: %s Initial delay time: %f' % (self.dfile.filename, junk_time))
         if run_time > 0:
             logging.debug('Run time: %d seconds' % run_time)
