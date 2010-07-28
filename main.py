@@ -24,6 +24,7 @@ class THOptions(usage.Options):
         ['baudrate', 'b', 115200, 'Serial baudrate'],
         ['port', 'p', '/dev/tty.usbserial-A700ejg7', 'Serial port to use'],
         ['filename', 'f', 'datafile.txt', 'datafile to append to'],
+        ['focal_length', 'd', 15.0, 'Distance from sensor to watch, in centimeters'],
         ['watch_url', 'u', None, 'URL for watch information'],
         ['data_dir', 'd', 'data', 'Datafile directory to write to'],
         ['sample_delay', 's', '5.0', 'Seconds between samples'],
@@ -32,12 +33,12 @@ class THOptions(usage.Options):
         ]
 
 class FlexOpt(LineReceiver):
-    def __init__(self, filename, data_dir=None, run_time=0, junk_time=2, watch_url=None):
-        self.dfile = FODatafile(filename, data_dir, watch_url=watch_url)
-        logging.debug('Filename: %s Initial delay time: %f' % (self.dfile.filename, junk_time))
+    def __init__(self, filename, data_dir=None, run_time=0, focal_length=None, watch_url=None):
+        self.dfile = FODatafile(filename, data_dir, watch_url=watch_url, focal_length=focal_length)
+        logging.debug('Filename: %s' % (self.dfile.filename))
         if run_time > 0:
             logging.debug('Run time: %d seconds' % run_time)
-        self.go_time = time.time() + junk_time
+        self.go_time = time.time()
         self.end_time = self.go_time + run_time
         self.run_time = run_time
 
@@ -52,9 +53,6 @@ class FlexOpt(LineReceiver):
         self.transport.write('\rrea\r')
 
     def lineReceived(self, line):
-        if time.time() < self.go_time:
-            return
-
         ts = time.time() - self.tzero
         str = line.strip()
 
@@ -74,7 +72,7 @@ class FlexOpt(LineReceiver):
 
         try:
             fv = float(str)
-        except ValueError, ve:
+        except ValueError:
             logging.exception('Error parsing as float: ')
             return
 
@@ -92,7 +90,10 @@ class FlexOpt(LineReceiver):
                 logging.info('Done.')
                 self.dfile.close()
                 self.transport.write('\r')
-                self.transport.write('bee\r')
+                self.transport.write('beep\r')
+                self.transport.write('beep\r')
+                self.transport.write('beep\r')
+                self.transport.write('beep\r')
                 self.transport.loseConnection()
                 reactor.stop()
 
@@ -112,14 +113,14 @@ if __name__ == '__main__':
     port = o.opts['port']
     filename = o.opts['filename']
     data_dir = o.opts['data_dir']
-    junk_time = int(o.opts['junktime'])
     run_time = int(o.opts['runtime'])
     sample_delay = float(o.opts['sample_delay'])
     watch_url = o.opts['watch_url']
+    focal_length = float(o.opts['focal_length'])
 
     logging.debug('About to open port %s' % port)
     fo = FlexOpt(filename, data_dir=data_dir, run_time=run_time,
-                 junk_time=junk_time, watch_url=watch_url)
+                 focal_length=focal_length, watch_url=watch_url)
     s = SerialPort(fo, port, reactor, baudrate=baudrate)
 
     # Setup periodic sampling call
