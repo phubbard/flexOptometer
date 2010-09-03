@@ -1,0 +1,9 @@
+Filename: data/datafile.txt
+Focal length: 15.000000 cm
+Copyright Paul Hubbard (phubbard@watchotaku.com) 2010
+License: http://creativecommons.org/licenses/by/3.0/us/
+See http://watchotaku.com/display/swr/Measure+luminosity
+Timestamp: 2010-07-27 17:59:54.836217
+UTC timestamp: 2010-07-28 00:59:54.836231
+
+Time(seconds)	Lux
