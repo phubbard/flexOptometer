@@ -1,5 +1,6 @@
 Filename: data/5517.txt
 Focal length: 15.000000 cm
+Watch info at: http://watchotaku.com/display/~pfh/OWC+MS-5517
 Copyright Paul Hubbard (phubbard@watchotaku.com) 2010
 License: http://creativecommons.org/licenses/by/3.0/us/
 See http://watchotaku.com/display/swr/Measure+luminosity
